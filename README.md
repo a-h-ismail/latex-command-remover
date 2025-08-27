@@ -17,7 +17,7 @@ If no command is specified, the default is to remove the easyReview and changes 
 The command applies changes in the same file and renames the original file to the following format: `original_name.timestamp.bak` so you can always undo changes by this command if needed. I recommend to keep the backup files until you're sure that everything is as expected.
 ```
 
-It is recommended to include this 
+It is recommended to include this command in the User Commands section of TeXstudio (or the equivalent in other IDEs) for easy, GUI based usage of this tool. After installation, add the following user command to TeXstudio: `apply-tex-changes %.tex` and label it `Apply Changes`, then you can call this tool on the open document from Tools -> User -> Apply Changes.
 
 ## Instalation
 
