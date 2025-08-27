@@ -222,9 +222,10 @@ int main(int argc, char *argv[])
     if (argc < 2)
     {
         puts("Usage: apply_tex_changes texfile.tex [command1:action1:preserved_index1 ...]\n");
-        puts("The action could be d (delete) or p (preserve)");
-        puts("Preserved index is relevant to \"preserve\" mode, indicating which argument content to keep (zero indexed)\n");
+        puts("The action could be d (delete) or p (preserve).");
+        puts("Preserved index is relevant to the \"preserve\" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument).\n");
         puts("If no command is specified, the default is to remove the easyReview and changes LateX packages commands while applying the stated changes.");
+        puts("The command applies changes in the same file and renames the original file to the following format: \"original_name.timestamp.bak\" so you can always undo changes by this command if needed. Keep the backup files until you're sure that everything is as expected.");
         return EXIT_SUCCESS;
     }
 
