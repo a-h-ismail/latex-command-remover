@@ -1,0 +1,55 @@
+# LaTeX Command Remover
+
+## Description
+
+A tool to remove commands from LaTeX source files. Originally intended to apply changes written in LaTeX files using both `easyReview` and `changes` packages, but can also remove any command the user specifies while optionally preserving one argument
+
+## Usage
+
+```
+apply_tex_changes texfile.tex [command1:action1:preserved_index1 ...]
+
+The action could be d (delete) or p (preserve).
+Preserved index is relevant to the "preserve" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument).
+
+If no command is specified, the default is to remove the easyReview and changes LateX packages commands while applying the stated changes.
+
+The command applies changes in the same file and renames the original file to the following format: `original_name.timestamp.bak` so you can always undo changes by this command if needed. I recommend to keep the backup files until you're sure that everything is as expected.
+```
+
+It is recommended to include this 
+
+## Instalation
+
+### Windows
+
+A precompiled executable is included in the "Releases" section. I recommend to place the executable somewhere in your Windows PATH.
+
+### Linux
+
+Make sure you have a working `gcc` compiler, install it using your package manager (ex: `sudo apt install gcc` for Ubuntu/Debian).
+
+Clone the repository and execute the install script as root:
+
+```
+git clone --depth 1 https://github.com/a-h-ismail/latex-command-remover.git
+cd latex-command-remover
+chmod +x ./install.sh
+sudo ./install.sh
+```
+
+Done!
+
+## Uninstallation
+
+### Windows
+
+Remove the apply-tex-changes.exe executable from your PATH (or wherever you placed it)
+
+### Linux
+
+Run the removal script (the same as above but with `remove.sh` instead of `install.sh`)
+
+## License
+
+This project is licensed under the GNU GPL-3.0-or-later.
