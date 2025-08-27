@@ -7,6 +7,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 #include <time.h>
 #include <stdbool.h>
 #include <inttypes.h>
+#include <ctype.h>
 
 #define array_length(z) (sizeof(z) / sizeof(*z))
 
@@ -70,6 +71,7 @@ size_t find_closing_sb(char *text, size_t i)
 size_t f_search(char *str, char *keyword, size_t index)
 {
     char *match;
+    size_t keylen = strlen(keyword);
     while (1)
     {
         // Search for the needle in the haystack
@@ -79,9 +81,9 @@ size_t f_search(char *str, char *keyword, size_t index)
         else
         {
             size_t i = match - str;
-            // skip latex escaped matches
-            if (i > 0 && str[i - 1] == '\\')
-                index = i + strlen(keyword);
+            // skip latex escaped matches or partial matches
+            if (i > 0 && (str[i - 1] == '\\' || isalpha(str[i + keylen])))
+                index = i + keylen;
             else
                 return match - str;
         }
@@ -165,13 +167,8 @@ char *remove_tex_command(const char *command, char *text, bool delete_content, i
                 break;
 
         // Command without arguments or options
-        case ' ':
-            orig_i = cmd_start + cmd_len;
-            continue;
-
         default:
-            // Not an exact match of the command, move to the next match
-            orig_i += cmd_len;
+            orig_i = cmd_start + cmd_len;
             continue;
         }
 
@@ -221,9 +218,9 @@ int main(int argc, char *argv[])
 {
     if (argc < 2)
     {
-        puts("Usage: apply_tex_changes texfile.tex [command1:action1:preserved_index1 ...]\n");
+        puts("Usage: apply-tex-changes texfile.tex [command1:action1:preserved_index1 ...]\n");
         puts("The action could be d (delete) or p (preserve).");
-        puts("Preserved index is relevant to the \"preserve\" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument).\n");
+        puts("Preserved index is relevant to the \"preserve\" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument). Default is the first argument.\n");
         puts("If no command is specified, the default is to remove the easyReview and changes LateX packages commands while applying the stated changes.");
         puts("The command applies changes in the same file and renames the original file to the following format: \"original_name.timestamp.bak\" so you can always undo changes by this command if needed. Keep the backup files until you're sure that everything is as expected.");
         return EXIT_SUCCESS;
