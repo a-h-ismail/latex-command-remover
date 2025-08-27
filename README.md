@@ -10,7 +10,7 @@ A tool to remove commands from LaTeX source files. Originally intended to apply 
 apply-tex-changes texfile.tex [command1:action1:preserved_index1 ...]
 
 The action could be d (delete) or p (preserve).
-Preserved index is relevant to the "preserve" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument).
+Preserved index is relevant to the "preserve" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument). Default value is zero.
 
 If no command is specified, the default is to remove the easyReview and changes LateX packages commands while applying the stated changes.
 
@@ -18,6 +18,20 @@ The command applies changes in the same file and renames the original file to th
 ```
 
 It is recommended to include this command in the User Commands section of TeXstudio (or the equivalent in other IDEs) for easy, GUI based usage of this tool. After installation, add the following user command to TeXstudio: `apply-tex-changes %.tex` and label it `Apply Changes`, then you can call this tool on the open document from Tools -> User -> Apply Changes.
+
+### Example
+
+To remove all bold text commands while preserving the content of the bold text (first argument):
+
+```bash
+apply-tex-changes texfile.tex textbf:p:0
+```
+
+To completely remove all instances of the `\tiny` command:
+
+```bash
+apply-tex-changes texfile.tex tiny:d
+```
 
 ## Instalation
 
