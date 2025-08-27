@@ -7,7 +7,7 @@ A tool to remove commands from LaTeX source files. Originally intended to apply 
 ## Usage
 
 ```
-apply_tex_changes texfile.tex [command1:action1:preserved_index1 ...]
+apply-tex-changes texfile.tex [command1:action1:preserved_index1 ...]
 
 The action could be d (delete) or p (preserve).
 Preserved index is relevant to the "preserve" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument).
