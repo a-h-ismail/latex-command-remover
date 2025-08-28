@@ -1,79 +1,52 @@
-// Credits to https://stackoverflow.com/a/44894946
-// Used to read the entire file to memory without possible file size race condition
-// Slightly modified to split the original answer to a source and header file and use larger read chunk
-
-#include "readall.h"
-/* This function returns one of the READALL_ constants above.
-   If the return value is zero == READALL_OK, then:
-     (*dataptr) points to a dynamically allocated buffer, with
-     (*sizeptr) chars read from the file.
-     The buffer is allocated for one extra char, which is NUL,
-     and automatically appended after the data.
-   Initial values of (*dataptr) and (*sizeptr) are ignored.
+/*
+Copyright (C) 2025 Ahmad Ismail
+SPDX-License-Identifier: GPL-3.0-or-later
 */
-int readall(FILE *in, char **dataptr, size_t *sizeptr)
+#include "readall.h"
+
+int fread_all(FILE *input_file, char **text, size_t *total_bytes_read)
 {
-    char *data = NULL, *temp;
-    size_t size = 0;
-    size_t used = 0;
-    size_t n;
+    // All parameters received should point to valid variables
+    if (input_file == NULL || text == NULL || total_bytes_read == NULL)
+        return -1;
 
-    /* None of the parameters can be NULL. */
-    if (in == NULL || dataptr == NULL || sizeptr == NULL)
-        return READALL_INVALID;
+    // Make sure we are at the file start
+    if (ferror(input_file) == 0)
+        rewind(input_file);
+    else
+        return -1;
 
-    /* A read error already occurred? */
-    if (ferror(in))
-        return READALL_ERROR;
+    size_t next_char_index = 0;
+    // Read text in blocks of 1MB
+    size_t batch_size = 1e6, bytes_in_batch;
+    char *txt_tmp = malloc(batch_size * sizeof(char));
 
     while (1)
     {
+        bytes_in_batch = fread(txt_tmp + next_char_index, 1, batch_size, input_file);
 
-        if (used + READALL_CHUNK + 1 > size)
-        {
-            size = used + READALL_CHUNK + 1;
-
-            /* Overflow check. Some ANSI C compilers
-               may optimize this away, though. */
-            if (size <= used)
-            {
-                free(data);
-                return READALL_TOOMUCH;
-            }
-
-            temp = realloc(data, size);
-            if (temp == NULL)
-            {
-                free(data);
-                return READALL_NOMEM;
-            }
-            data = temp;
-        }
-
-        n = fread(data + used, 1, READALL_CHUNK, in);
-        if (n == 0)
+        // An error occured?
+        if (ferror(input_file) != 0)
             break;
 
-        used += n;
+        // Reading completed
+        if (bytes_in_batch == 0 || feof(input_file) != 0)
+        {
+            *total_bytes_read = next_char_index + bytes_in_batch;
+            txt_tmp[*total_bytes_read] = '\0';
+            *text = realloc(txt_tmp, *(total_bytes_read + 1) * sizeof(char));
+            return 0;
+        }
+        else
+        {
+            // More bytes to go
+            next_char_index += bytes_in_batch;
+            txt_tmp = realloc(txt_tmp, (next_char_index + batch_size) * sizeof(char));
+        }
     }
 
-    if (ferror(in))
-    {
-        free(data);
-        return READALL_ERROR;
-    }
-
-    temp = realloc(data, used + 1);
-    if (temp == NULL)
-    {
-        free(data);
-        return READALL_NOMEM;
-    }
-    data = temp;
-    data[used] = '\0';
-
-    *dataptr = data;
-    *sizeptr = used;
-
-    return READALL_OK;
+    // If the loop breaks, we have an error
+    // It should return from the inside if the operation completes successfully
+    free(txt_tmp);
+    return -1;
 }

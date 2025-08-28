@@ -259,8 +259,8 @@ int main(int argc, char *argv[])
 
     char *file_contents;
     size_t file_len;
-    int status = readall(input_file, &file_contents, &file_len);
-    if (status != READALL_OK)
+    int status = fread_all(input_file, &file_contents, &file_len);
+    if (status != 0)
     {
         printf("Failed to read the input file, reason %d\n", status);
         return EXIT_FAILURE;
