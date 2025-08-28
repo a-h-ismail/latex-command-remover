@@ -16,6 +16,8 @@ Preserved index is relevant to the "preserve" action, indicating the argument wh
 - The command applies changes in the same file and renames the original file to the following format: `original_name.timestamp.bak` so you can always undo changes by this command if needed. I recommend to keep the backup files until you're sure that everything is as expected.
 - It is recommended to include this command in the User Commands section of TeXstudio (or the equivalent in other IDEs) for easy, GUI based usage of this tool. After installation, add the following user command to TeXstudio: `apply-tex-changes %.tex` and label it `Apply Changes`, then you can call this tool on the open document from Tools -> User -> Apply Changes.
 
+**While this tool creates a backup automatically for the source file, it is recommended to have your own backup before running the tool. I am not responsible for possible data loss due to unknown bugs or incorrect usage (like unsupported encodings).**
+
 ### Example
 
 To remove all bold text commands while preserving the content of the bold text (first argument):
@@ -32,7 +34,9 @@ apply-tex-changes texfile.tex tiny:d
 
 ## Supported Character Encoding
 
-This tool supports any encoding that is fully backward compatible with ASCII like UTF-8 (because it uses 8 bit chars). If the command produces a corrupted file, please restore the last backup (name format: `original_name.timestamp.bak`). When using a non supported encoding, the program will either do nothing or possibly corrupt the file. So for guaranteed reliability, ensure that your file is ASCII or UTF-8 encoded.
+This tool supports any encoding that is fully backward compatible with ASCII like UTF-8 (because it uses 8 bit chars). If the command produces a corrupted file, please restore the last backup (name format: `original_name.timestamp.bak`).
+
+**WARNING:** When using a non supported encoding, the program will either corrupt the file, return an empty file (case of UTF-16), possibly work or do nothing. So for guaranteed reliability, ensure that your file is ASCII or UTF-8 encoded.
 
 ## Instalation
 
