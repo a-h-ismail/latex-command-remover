@@ -8,6 +8,7 @@ SPDX-License-Identifier: GPL-3.0-or-later
 #include <stdbool.h>
 #include <inttypes.h>
 #include <ctype.h>
+#include <assert.h>
 
 #define array_length(z) (sizeof(z) / sizeof(*z))
 
@@ -226,9 +227,14 @@ int main(int argc, char *argv[])
         return EXIT_SUCCESS;
     }
 
+    // Lazy ASCII assertion
+    // Should be enough to detect EBCDIC (just in case you had an unexpected compiler/runtime)
+    assert(' ' == 32);
+    assert('d' == 100);
+
     char *default_commands[] = {"added:p", "deleted:d", "replaced:p:0", "comment:d", "highlight:d", "add:p", "remove:d", "replace:p:1"};
     char **command_list;
-    int total_commands;
+    size_t total_commands;
 
     // Use default values (for the changes package)
     if (argc == 2)
@@ -252,8 +258,8 @@ int main(int argc, char *argv[])
     }
 
     char *file_contents;
-    size_t len;
-    int status = readall(input_file, &file_contents, &len);
+    size_t file_len;
+    int status = readall(input_file, &file_contents, &file_len);
     if (status != READALL_OK)
     {
         printf("Failed to read the input file, reason %d\n", status);
@@ -319,42 +325,47 @@ int main(int argc, char *argv[])
         file_contents = out;
     }
 
-    // Conversion complete, rename the old file and write the new file
-    char output_filename[strlen(argv[1]) + 30], *input_filename = argv[1];
-    char time_str[22];
-    sprintf(time_str, ".%lld", (long long)time(NULL));
-
-    // Building the output filename
-    strcpy(output_filename, argv[1]);
-    strcat(output_filename, time_str);
-    strcat(output_filename, ".bak");
-
-    // Rename the original file to avoid data loss if something wrong happened
-    status = rename(input_filename, output_filename);
-
-    // Failed to rename the original file
-    if (status != 0)
+    if (strlen(out) == file_len)
+        puts("No instance of the specified commands found, no changes applied.");
+    else
     {
-        perror("Failed to rename the source file");
-        return EXIT_FAILURE;
-    }
+        // Conversion complete, rename the old file and write the new file
+        char output_filename[strlen(argv[1]) + 30], *input_filename = argv[1];
+        char time_str[22];
+        sprintf(time_str, ".%lld", (long long)time(NULL));
 
-    output_file = fopen(input_filename, "w");
-    if (output_file == NULL)
-    {
-        perror("Failed to write the output file");
+        // Building the output filename
+        strcpy(output_filename, argv[1]);
+        strcat(output_filename, time_str);
+        strcat(output_filename, ".bak");
 
-        // Restore the original file then
-        status = rename(output_filename, input_filename);
-        // Failed to rename the backup file back to the original name
+        // Rename the original file to avoid data loss if something wrong happened
+        status = rename(input_filename, output_filename);
+
+        // Failed to rename the original file
         if (status != 0)
-            perror("Failed to rename the backup file");
+        {
+            perror("Failed to rename the source file");
+            return EXIT_FAILURE;
+        }
 
-        return EXIT_FAILURE;
+        output_file = fopen(input_filename, "w");
+        if (output_file == NULL)
+        {
+            perror("Failed to write the output file");
+
+            // Restore the original file then
+            status = rename(output_filename, input_filename);
+            // Failed to rename the backup file back to the original name
+            if (status != 0)
+                perror("Failed to rename the backup file");
+
+            return EXIT_FAILURE;
+        }
+
+        fwrite(out, 1, strlen(out), output_file);
+        fclose(output_file);
     }
-
-    fwrite(out, 1, strlen(out), output_file);
-    fclose(output_file);
 
     // Silence leak checkers
     free(file_contents);
