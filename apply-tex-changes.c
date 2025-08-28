@@ -267,6 +267,13 @@ int main(int argc, char *argv[])
     }
     fclose(input_file);
 
+    // Catch some incompatible encodings like UTF-16
+    if (file_len != strlen(file_contents))
+    {
+        fputs("Read file length mismatch, likely because of unsupported character encoding.\nPlease use ASCII or UTF-8 encoding.\n", stderr);
+        return 2;
+    }
+
     char *out, *cmd_name, *op_char, *arg_to_keep_str;
     bool delete_content;
     int arg_to_keep;
