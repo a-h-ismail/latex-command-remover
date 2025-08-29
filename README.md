@@ -2,7 +2,7 @@
 
 ## Description
 
-A tool to remove commands from LaTeX source files. Originally intended to apply changes written in LaTeX files using both `easyReview` and `changes` packages, but can also remove any command the user specifies while optionally preserving one argument
+A tool to remove commands from LaTeX source files. Originally intended to apply changes written in LaTeX files using both `easyReview` and `changes` packages, but can also remove any command the user specifies while optionally preserving one argument.
 
 ## Usage
 
@@ -40,10 +40,6 @@ This tool supports any encoding that is fully backward compatible with ASCII lik
 
 ## Instalation
 
-### Windows
-
-A precompiled executable is included in the "Releases" section. I recommend to place the executable somewhere in your Windows PATH.
-
 ### Linux
 
 Make sure you have a working `gcc` compiler, install it using your package manager (ex: `sudo apt install gcc` for Ubuntu/Debian).
@@ -60,10 +56,6 @@ sudo ./install.sh
 Done!
 
 ## Uninstallation
-
-### Windows
-
-Remove the apply-tex-changes.exe executable from your PATH (or wherever you placed it)
 
 ### Linux
 
