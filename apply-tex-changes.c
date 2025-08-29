@@ -25,26 +25,44 @@ char *strtok_m(char *_s, const char *delimiter)
     return strtok((_s == NULL ? NULL : text), delimiter);
 }
 
+// Verifies if the backslash at index i is really escaping
+// If text[i] has no backslash, the command always returns false
+bool is_escaping(char *text, int64_t i)
+{
+    // There is no backslash, so not escaping
+    if (text[i] != '\\')
+        return false;
+
+    bool is_escaping = true;
+
+    // With each new preceding backslash, flip the escaping state
+    // Remember that two backslashes is a newline in LaTeX, and they can be consecutive
+    while (i > 0 && text[--i] == '\\')
+        is_escaping ^= true;
+
+    return is_escaping;
+}
+
 // Finds the closing symbol for the specified opening symbol
 // Ignores escaped symbols
-size_t find_closing(char *text, size_t i, char opening, char closing)
+int64_t find_closing(char *text, int64_t i, char opening, char closing)
 {
     // Can't find a closing for no opening
     if (text[i] != opening)
         return -1;
 
     // Initializing depth to 1 because the function receives the index of an open symbol
-    size_t depth = 1;
+    int64_t depth = 1;
     while (text[i] != '\0' && depth != 0)
     {
         // Skipping over the first bracket
         ++i;
         // Avoid escaped brackets
-        if (text[i - 1] != '\\')
+        if (i > 0)
         {
-            if (text[i] == opening)
+            if (text[i] == opening && !is_escaping(text, i - 1))
                 ++depth;
-            else if (text[i] == closing)
+            else if (text[i] == closing && !is_escaping(text, i - 1))
                 --depth;
         }
     }
@@ -56,23 +74,23 @@ size_t find_closing(char *text, size_t i, char opening, char closing)
 }
 
 // Finds the closing bracket } for the specified open bracket {
-size_t find_closing_bracket(char *text, size_t i)
+int64_t find_closing_bracket(char *text, int64_t i)
 {
     return find_closing(text, i, '{', '}');
 }
 
 // Finds the closing square bracket ] for the specified open square bracket [
-size_t find_closing_sb(char *text, size_t i)
+int64_t find_closing_sb(char *text, int64_t i)
 {
     return find_closing(text, i, '[', ']');
 }
 
 // Forward search the keyword in the string, ignoring escaped matches
 // Returns the first match starting from "index" or -1 if nothing is found
-size_t f_search(char *str, char *keyword, size_t index)
+int64_t f_search(char *str, char *keyword, int64_t index)
 {
     char *match;
-    size_t keylen = strlen(keyword);
+    int64_t keylen = strlen(keyword);
     while (1)
     {
         // Search for the needle in the haystack
@@ -81,9 +99,9 @@ size_t f_search(char *str, char *keyword, size_t index)
             return -1;
         else
         {
-            size_t i = match - str;
+            int64_t i = match - str;
             // skip latex escaped matches or partial matches
-            if (i > 0 && (str[i - 1] == '\\' || isalpha(str[i + keylen])))
+            if (i > 0 && (is_escaping(str, i - 1) || isalpha(str[i + keylen])))
                 index = i + keylen;
             else
                 return match - str;
@@ -91,7 +109,7 @@ size_t f_search(char *str, char *keyword, size_t index)
     }
 }
 
-int find_arg_bounds(char *text, size_t first_arg, int arg_index, size_t *start, size_t *end)
+int find_arg_bounds(char *text, int64_t first_arg, int arg_index, int64_t *start, int64_t *end)
 {
     // Find bounds of the first argument
     if (arg_index == 0)
@@ -106,7 +124,7 @@ int find_arg_bounds(char *text, size_t first_arg, int arg_index, size_t *start, 
 
     // Find bounds of the second argument or more
     // Initialize to end of the first argument
-    size_t s, e = find_closing_bracket(text, first_arg);
+    int64_t s, e = find_closing_bracket(text, first_arg);
     for (int curr_arg = 0; curr_arg != arg_index; ++curr_arg)
     {
         s = e + 1;
@@ -123,7 +141,7 @@ int find_arg_bounds(char *text, size_t first_arg, int arg_index, size_t *start, 
 
 char *remove_tex_command(const char *command, char *text, bool delete_content, int arg_to_keep)
 {
-    size_t txt_len = strlen(text);
+    int64_t txt_len = strlen(text);
     // Length of the command including the starting backslash
     int cmd_len = strlen(command) + 1;
     char cmd_text[cmd_len + 1];
@@ -133,7 +151,7 @@ char *remove_tex_command(const char *command, char *text, bool delete_content, i
 
     char *cleaned_text = malloc(txt_len + 1 * sizeof(char));
 
-    size_t orig_i = 0, new_i = 0, cmd_start, cmd_end, bytes_to_copy, args_start;
+    int64_t orig_i = 0, new_i = 0, cmd_start, cmd_end, bytes_to_copy, args_start;
     while ((cmd_start = f_search(text, cmd_text, orig_i)) != -1)
     {
         // Copy the relevant text before the command (between the last copied index and the current match)
@@ -174,7 +192,7 @@ char *remove_tex_command(const char *command, char *text, bool delete_content, i
         }
 
         // Find the end of the last argument
-        size_t next_start = args_start;
+        int64_t next_start = args_start;
         while (1)
         {
             cmd_end = find_closing_bracket(text, next_start);
@@ -196,7 +214,7 @@ char *remove_tex_command(const char *command, char *text, bool delete_content, i
         if (!delete_content)
         {
             // Target argument start/end
-            size_t start, end;
+            int64_t start, end;
             int status = find_arg_bounds(text, args_start, arg_to_keep, &start, &end);
             if (status == -1)
             {
