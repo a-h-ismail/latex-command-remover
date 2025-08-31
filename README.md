@@ -36,9 +36,9 @@ apply-tex-changes texfile.tex tiny:d
 
 This tool supports any encoding that is fully backward compatible with ASCII like UTF-8 (because it uses 8 bit chars). If the command produces a corrupted file, please restore the last backup (name format: `original_name.timestamp.bak`).
 
-**WARNING:** When using a non supported encoding, the program will either corrupt the file, return an empty file (case of UTF-16), possibly work or do nothing. So for guaranteed reliability, ensure that your file is ASCII or UTF-8 encoded.
+**WARNING:** When using a non supported encoding, the program will either corrupt the file, possibly work or do nothing. So for guaranteed reliability, ensure that your file is ASCII or UTF-8 encoded.
 
-## Instalation
+## Installation
 
 ### Linux
 
