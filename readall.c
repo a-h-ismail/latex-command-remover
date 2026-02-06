@@ -27,8 +27,10 @@ int fread_all(FILE *input_file, char **text, size_t *total_bytes_read)
 
         // An error occured?
         if (ferror(input_file) != 0)
-            break;
-
+        {
+            free(txt_tmp);
+            return -1;
+        }
         // Reading completed
         if (bytes_in_batch == 0 || feof(input_file) != 0)
         {
@@ -44,9 +46,4 @@ int fread_all(FILE *input_file, char **text, size_t *total_bytes_read)
             txt_tmp = realloc(txt_tmp, (next_char_index + batch_size) * sizeof(char));
         }
     }
-
-    // If the loop breaks, we have an error
-    // It should return from the inside if the operation completes successfully
-    free(txt_tmp);
-    return -1;
 }
