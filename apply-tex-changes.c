@@ -1,5 +1,5 @@
 /*
-Copyright (C) 2025 Ahmad Ismail
+Copyright (C) 2025-2026 Ahmad Ismail
 SPDX-License-Identifier: GPL-3.0-or-later
 */
 #include "readall.h"
@@ -250,7 +250,9 @@ int main(int argc, char *argv[])
     assert(' ' == 32);
     assert('d' == 100);
 
-    char *default_commands[] = {"added:p", "deleted:d", "replaced:p:0", "comment:d", "highlight:d", "add:p", "remove:d", "replace:p:1"};
+    char *default_commands[] = {"added:p",   "deleted:d",     "replaced:p:0",
+                                "comment:d", "highlight:p:0", "add:p",
+                                "remove:d",  "replace:p:1"};
     char **command_list;
     size_t total_commands;
 
