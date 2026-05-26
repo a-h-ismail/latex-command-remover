@@ -7,6 +7,6 @@ else
   echo "Removing LaTeX Command Remover (system wide)"
 fi
 
-rm /usr/local/bin/apply-tex-changes
+rm /usr/local/bin/{latex-command-remover,apply-tex-changes}
 
 echo Done!

@@ -7,7 +7,8 @@ else
   echo "Installing LaTeX Command Remover (system wide)"
 fi
 
-gcc -O2 apply-tex-changes.c readall.c -o apply-tex-changes
-mv apply-tex-changes /usr/local/bin
+gcc -O2 main.c readall.c -o latex-command-remover
+mv latex-command-remover /usr/local/bin
+ln -s /usr/local/bin/latex-command-remover /usr/local/bin/apply-tex-changes 
 
 echo Done!
