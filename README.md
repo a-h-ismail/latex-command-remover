@@ -7,12 +7,16 @@ A tool to remove commands from LaTeX source files. Originally intended to apply 
 ## Usage
 
 ```
-apply-tex-changes texfile.tex [command1:action1:preserved_index1 ...]
+latex-command-remover texfile.tex command1:action1:preserved_index1 ...
+```
+Or
+```
+apply-tex-changes TEXFILE [command1:action1:preserved_index1 ...]
 ```
 
 - The action could be d (delete) or p (preserve).
 Preserved index is relevant to the "preserve" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument). Default value is zero.
-- If no command is specified, the default is to remove the easyReview and changes LateX packages commands while applying the stated changes.
+- If no command is specified and you invoke the tool using `apply-tex-changes`, the default is to remove the easyReview and changes LateX packages commands while applying the stated changes.
 - The command applies changes in the same file and renames the original file to the following format: `original_name.timestamp.bak` so you can always undo changes by this command if needed. I recommend to keep the backup files until you're sure that everything is as expected.
 - It is recommended to include this command in the User Commands section of TeXstudio (or the equivalent in other IDEs) for easy, GUI based usage of this tool. After installation, add the following user command to TeXstudio: `apply-tex-changes %.tex` and label it `Apply Changes`, then you can call this tool on the open document from Tools -> User -> Apply Changes.
 

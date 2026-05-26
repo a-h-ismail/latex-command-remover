@@ -235,13 +235,19 @@ char *remove_tex_command(const char *command, char *text, bool delete_content, i
 
 int main(int argc, char *argv[])
 {
+    // Command invoked as apply-tex-changes?
+    bool invoked_as_atc = (strstr(argv[0], "apply-tex-changes") != NULL);
     if (argc < 2)
     {
-        puts("Usage: apply-tex-changes texfile.tex [command1:action1:preserved_index1 ...]\n");
+        if (invoked_as_atc)
+            puts("Usage: apply-tex-changes TEXFILE [command1:action1:preserved_index1 ...]\n");
+        else
+            puts("Usage: latex-command-remover TEXFILE command1:action1:preserved_index1 ...\n");
         puts("The action could be d (delete) or p (preserve).");
-        puts("Preserved index is relevant to the \"preserve\" action, indicating the argument whose content will be preserved (counting starts from 0 so 0 is the first argument). Default is the first argument.\n");
-        puts("If no command is specified, the default is to remove the easyReview and changes LateX packages commands while applying the stated changes.");
-        puts("The command applies changes in the same file and renames the original file to the following format: \"original_name.timestamp.bak\" so you can always undo changes by this command if needed. Keep the backup files until you're sure that everything is as expected.");
+        puts("Preserved index is relevant to the \"preserve\" action, indicating the argument whose content will be preserved. Default is 0 (first argument).\n");
+        if (invoked_as_atc)
+            puts("If no command is specified, the default is to remove the easyReview and changes LateX packages commands while applying the stated changes.");
+        puts("The command applies changes in the same file and renames the original file to the following format: \"original_name.timestamp.bak\" so you can always undo changes by this command.\nKeep the backup files until you're sure that everything is as expected.");
         return EXIT_SUCCESS;
     }
 
@@ -256,10 +262,10 @@ int main(int argc, char *argv[])
     char **command_list;
     size_t total_commands;
 
-    // Use default values (for the changes package) only if invoked as "apply-tex-changes"
     if (argc == 2)
     {
-        if (strstr(argv[0], "apply-tex-changes") != NULL)
+        // Use default values (for the changes package) only if invoked as "apply-tex-changes"
+        if (invoked_as_atc)
         {
             command_list = default_commands;
             total_commands = array_length(default_commands);
