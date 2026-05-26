@@ -256,11 +256,19 @@ int main(int argc, char *argv[])
     char **command_list;
     size_t total_commands;
 
-    // Use default values (for the changes package)
+    // Use default values (for the changes package) only if invoked as "apply-tex-changes"
     if (argc == 2)
     {
-        command_list = default_commands;
-        total_commands = array_length(default_commands);
+        if (strstr(argv[0], "apply-tex-changes") != NULL)
+        {
+            command_list = default_commands;
+            total_commands = array_length(default_commands);
+        }
+        else
+        {
+            fputs("Expected a list of actions after the filename.\n", stderr);
+            return EXIT_FAILURE;
+        }
     }
     else
     {
